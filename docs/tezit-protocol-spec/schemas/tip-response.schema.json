@@ -1,0 +1,318 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tezit.com/spec/v1.2/tip-response.schema.json",
+  "title": "TIP Interrogation Response Schema",
+  "description": "JSON Schema for a Tez Interrogation Protocol (TIP) query response. Defines the structure returned by a TIP-compliant interrogation endpoint after processing a query. Every response includes a classification (grounded, inferred, partial, or abstention), citations to context items, and confidence signals. Responses are grounded exclusively in the Tez bundle's transmitted context.",
+  "type": "object",
+  "required": ["response_id", "response", "session", "created_at"],
+  "properties": {
+    "response_id": {
+      "type": "string",
+      "description": "Unique identifier for this specific response.",
+      "pattern": "^tip-resp-[a-zA-Z0-9]+$",
+      "examples": ["tip-resp-x7y8z9"]
+    },
+    "response": {
+      "type": "object",
+      "description": "The interrogation response content and metadata.",
+      "required": ["text", "classification", "confidence", "citations"],
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "The full response text, including inline citations in [[item-id:location]] format.",
+          "examples": ["According to [[budget:p4]], the infrastructure allocation is $500,000..."]
+        },
+        "classification": {
+          "type": "string",
+          "description": "Response classification indicating the relationship between the response content and the context window. 'grounded' means every claim is directly supported by context. 'inferred' means the response includes logical deductions that are explicitly labeled. 'partial' means some parts are answerable and some are not. 'abstention' means the context does not contain sufficient information.",
+          "enum": ["grounded", "inferred", "partial", "abstention"],
+          "examples": ["grounded"]
+        },
+        "confidence": {
+          "type": "string",
+          "description": "Overall confidence level for the response. Aggregated as the lowest confidence among all claims. 'high' means direct, unambiguous support in context. 'medium' means reasonable inference or combination of sources. 'low' means tangential or weak support only.",
+          "enum": ["high", "medium", "low"],
+          "examples": ["high"]
+        },
+        "citations": {
+          "type": "array",
+          "description": "Array of verified citation references from the response. Each citation maps a claim to a specific location in a context item.",
+          "items": {
+            "$ref": "#/$defs/citation"
+          }
+        },
+        "gaps": {
+          "type": "array",
+          "description": "Information gaps identified in the context relative to the query. Present for partial and abstention responses.",
+          "items": {
+            "type": "object",
+            "required": ["topic", "description"],
+            "properties": {
+              "topic": {
+                "type": "string",
+                "description": "The topic or information that is missing from the context.",
+                "examples": ["historical infrastructure spending"]
+              },
+              "description": {
+                "type": "string",
+                "description": "Detailed explanation of the gap.",
+                "examples": ["No prior-year budget data in context"]
+              }
+            },
+            "additionalProperties": false
+          },
+          "default": []
+        },
+        "inferences": {
+          "type": "array",
+          "description": "Explicit inferences drawn from the context. Present for inferred responses.",
+          "items": {
+            "type": "object",
+            "required": ["claim", "basis"],
+            "properties": {
+              "claim": {
+                "type": "string",
+                "description": "The inferred claim.",
+                "examples": ["The blended engineering rate is approximately $2,500 per week"]
+              },
+              "basis": {
+                "type": "array",
+                "description": "Citation references that form the basis of the inference.",
+                "items": {
+                  "type": "string"
+                },
+                "examples": [["project-plan:p4", "resource-plan:staffing", "sow-draft:p3"]]
+              },
+              "reasoning": {
+                "type": "string",
+                "description": "Explanation of the logical chain from context to inference."
+              }
+            },
+            "additionalProperties": false
+          },
+          "default": []
+        },
+        "claims": {
+          "type": "array",
+          "description": "Individual claims within the response with per-claim confidence levels. Optional but recommended for structured response format.",
+          "items": {
+            "type": "object",
+            "required": ["text", "confidence", "citations"],
+            "properties": {
+              "text": {
+                "type": "string",
+                "description": "The individual claim text."
+              },
+              "confidence": {
+                "type": "string",
+                "enum": ["high", "medium", "low"]
+              },
+              "citations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Citation references supporting this specific claim."
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "session": {
+      "type": "object",
+      "description": "Current session state after this query-response exchange.",
+      "required": ["query_count"],
+      "properties": {
+        "session_id": {
+          "type": "string",
+          "description": "The interrogation session identifier.",
+          "examples": ["tip-sess-a1b2c3d4"]
+        },
+        "query_count": {
+          "type": "integer",
+          "description": "Total queries submitted in this session so far.",
+          "minimum": 1
+        },
+        "remaining_queries": {
+          "type": "integer",
+          "description": "Number of queries remaining in the budget (for hosted sessions).",
+          "minimum": 0
+        },
+        "input_tokens": {
+          "type": "integer",
+          "description": "Input tokens consumed by this query.",
+          "minimum": 0
+        },
+        "output_tokens": {
+          "type": "integer",
+          "description": "Output tokens generated for this response.",
+          "minimum": 0
+        },
+        "total_tokens_used": {
+          "type": "integer",
+          "description": "Cumulative tokens used in this session.",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "query_id": {
+      "type": "string",
+      "description": "Identifier for the query that produced this response, enabling request-response correlation.",
+      "examples": ["tip-query-m3n4o5"]
+    },
+    "created_at": {
+      "type": "string",
+      "description": "ISO 8601 datetime when this response was generated.",
+      "format": "date-time",
+      "examples": ["2026-02-05T10:31:22Z"]
+    },
+    "error": {
+      "type": "object",
+      "description": "Error information if the query could not be fully processed. Present alongside or instead of the response.",
+      "required": ["type", "message"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Machine-readable error type.",
+          "enum": [
+            "context_loading_partial_failure",
+            "context_loading_total_failure",
+            "model_unavailable",
+            "token_limit_exceeded",
+            "malformed_query",
+            "timeout",
+            "budget_exhausted",
+            "version_mismatch"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "description": "Human-readable error description."
+        },
+        "retry_after_seconds": {
+          "type": "integer",
+          "description": "Suggested wait time before retrying, in seconds.",
+          "minimum": 0
+        },
+        "suggestion": {
+          "type": "string",
+          "description": "Actionable suggestion for the recipient."
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "citation": {
+      "type": "object",
+      "description": "A verified citation linking a response claim to a specific location in a context item.",
+      "required": ["item_id", "verified"],
+      "properties": {
+        "item_id": {
+          "type": "string",
+          "description": "The context item ID as defined in manifest.json context.items.",
+          "examples": ["budget", "client-specs", "meeting-notes"]
+        },
+        "location": {
+          "type": "string",
+          "description": "Location specifier within the context item (page, line, section, timestamp, etc.).",
+          "examples": ["p4", "p12-15", "L42", "L42-89", "executive-summary", "t0:15:30", "Q3:B2-F20", "$.api.rateLimit"]
+        },
+        "text_excerpt": {
+          "type": "string",
+          "description": "A brief excerpt from the cited location that supports the claim.",
+          "examples": ["Infrastructure allocation: $500,000"]
+        },
+        "claim": {
+          "type": "string",
+          "description": "The specific claim this citation supports.",
+          "examples": ["infrastructure allocation is $500,000"]
+        },
+        "verified": {
+          "type": "boolean",
+          "description": "Whether this citation has been verified by post-processing (item exists, location exists, content supports claim)."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "examples": [
+    {
+      "response_id": "tip-resp-x7y8z9",
+      "response": {
+        "text": "According to [[budget:p4]], the infrastructure allocation is $500,000. This breaks down as: cloud hosting ($200,000) [[budget:p4]], networking equipment ($150,000) [[budget:p5]], and security tools ($150,000) [[budget:p5]].",
+        "classification": "grounded",
+        "confidence": "high",
+        "citations": [
+          {
+            "item_id": "budget",
+            "location": "p4",
+            "text_excerpt": "Infrastructure allocation: $500,000",
+            "claim": "infrastructure allocation is $500,000",
+            "verified": true
+          },
+          {
+            "item_id": "budget",
+            "location": "p5",
+            "text_excerpt": "Networking: $150,000; Security: $150,000",
+            "verified": true
+          }
+        ],
+        "gaps": [],
+        "inferences": []
+      },
+      "session": {
+        "session_id": "tip-sess-a1b2c3d4",
+        "query_count": 1,
+        "remaining_queries": 99,
+        "input_tokens": 850,
+        "output_tokens": 320,
+        "total_tokens_used": 1170
+      },
+      "created_at": "2026-02-05T10:31:22Z"
+    },
+    {
+      "response_id": "tip-resp-abc123",
+      "response": {
+        "text": "The bundled context does not contain information about competitor spending. The context includes the Q4 budget proposal [[budget-proposal]], a vendor quote from CloudServ [[vendor-quote]], and budget committee meeting notes [[meeting-notes]], but none of these materials reference competitor budgets or industry benchmarks.",
+        "classification": "abstention",
+        "confidence": "high",
+        "citations": [
+          {
+            "item_id": "budget-proposal",
+            "verified": true
+          },
+          {
+            "item_id": "vendor-quote",
+            "verified": true
+          },
+          {
+            "item_id": "meeting-notes",
+            "verified": true
+          }
+        ],
+        "gaps": [
+          {
+            "topic": "competitor spending",
+            "description": "No competitor budgets, industry benchmarks, or external spending comparisons in context"
+          }
+        ],
+        "inferences": []
+      },
+      "session": {
+        "session_id": "tip-sess-a1b2c3d4",
+        "query_count": 5,
+        "remaining_queries": 95,
+        "input_tokens": 420,
+        "output_tokens": 280,
+        "total_tokens_used": 4500
+      },
+      "created_at": "2026-02-05T10:38:45Z"
+    }
+  ]
+}

@@ -1,0 +1,756 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tezit.com/spec/v1.2/manifest.schema.json",
+  "title": "Tezit Manifest Schema (Platform Tez - Level 3)",
+  "description": "Full JSON Schema for a Tezit Protocol v1.2 manifest.json file. Covers all required and optional fields for Platform Tez (Level 3) conformance, including creator metadata, typed context items with hashes, conversation record, permissions, lineage, profiles, surface (messaging), and extensions.",
+  "type": "object",
+  "required": [
+    "tezit_version",
+    "id",
+    "version",
+    "created_at",
+    "creator",
+    "synthesis",
+    "context"
+  ],
+  "properties": {
+    "tezit_version": {
+      "type": "string",
+      "description": "Tezit Protocol version this manifest conforms to.",
+      "const": "1.2",
+      "examples": ["1.2"]
+    },
+    "id": {
+      "type": "string",
+      "description": "Unique bundle identifier. Must contain only lowercase letters, numbers, and hyphens. Must be 3-100 characters. Must not start or end with a hyphen.",
+      "pattern": "^[a-z0-9](?:[a-z0-9-]{1,98}[a-z0-9])?$",
+      "minLength": 3,
+      "maxLength": 100,
+      "examples": ["acme-analysis-2026-01-15-001"]
+    },
+    "version": {
+      "type": "integer",
+      "description": "Bundle version number. Incremented on each update. Starts at 1.",
+      "minimum": 1,
+      "examples": [1, 3]
+    },
+    "created_at": {
+      "type": "string",
+      "description": "ISO 8601 datetime when the bundle was originally created.",
+      "format": "date-time",
+      "examples": ["2026-01-25T14:30:00Z"]
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "ISO 8601 datetime when the bundle was last updated. Present when version > 1.",
+      "format": "date-time",
+      "examples": ["2026-02-01T09:15:00Z"]
+    },
+    "update_type": {
+      "type": "string",
+      "description": "How the update was triggered. Present when version > 1.",
+      "enum": ["manual", "auto"],
+      "examples": ["auto"]
+    },
+    "update_source": {
+      "type": "string",
+      "description": "The context item ID that triggered the update (for auto updates).",
+      "examples": ["revenue-model"]
+    },
+    "update_reason": {
+      "type": "string",
+      "description": "Human-readable description of why the update occurred.",
+      "examples": ["Linked source sync"]
+    },
+    "previous_version": {
+      "type": "integer",
+      "description": "The version number this update supersedes.",
+      "minimum": 1
+    },
+    "creator": {
+      "type": "object",
+      "description": "Information about who created this Tez.",
+      "required": ["name"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the creator (platform-specific).",
+          "examples": ["user-jane-smith-001"]
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable name of the creator.",
+          "minLength": 1,
+          "examples": ["Jane Smith"]
+        },
+        "email": {
+          "type": "string",
+          "description": "Creator's email address.",
+          "format": "email",
+          "examples": ["jane@company.com"]
+        },
+        "org": {
+          "type": "string",
+          "description": "Creator's organization.",
+          "examples": ["Acme Corp"]
+        },
+        "url": {
+          "type": "string",
+          "description": "URL associated with the creator (profile page, website, etc.).",
+          "format": "uri",
+          "examples": ["https://company.com/people/jane-smith"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "profile": {
+      "type": "string",
+      "description": "Tez profile indicating the intended consumption pattern. Profiles are hints, not barriers -- any Tez can be interrogated regardless of profile.",
+      "enum": ["knowledge", "messaging", "decision", "handoff", "learning", "negotiation"],
+      "default": "knowledge",
+      "examples": ["knowledge", "messaging"]
+    },
+    "synthesis": {
+      "type": "object",
+      "description": "Metadata about the synthesis document (tez.md).",
+      "required": ["title", "type", "file"],
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Human-readable title of the synthesis.",
+          "minLength": 1,
+          "examples": ["Acme Partnership Analysis"]
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of synthesis content.",
+          "enum": [
+            "general",
+            "recommendation",
+            "proposal",
+            "analysis",
+            "summary",
+            "comparison",
+            "review",
+            "tutorial",
+            "custom"
+          ],
+          "examples": ["recommendation"]
+        },
+        "file": {
+          "type": "string",
+          "description": "Relative path to the synthesis document within the bundle.",
+          "examples": ["tez.md"]
+        },
+        "abstract": {
+          "type": "string",
+          "description": "Brief summary of the synthesis content.",
+          "maxLength": 500,
+          "examples": ["Analysis of the proposed Acme partnership with recommendations for deal structure and timeline."]
+        },
+        "language": {
+          "type": "string",
+          "description": "BCP 47 language tag indicating the primary language of the synthesis.",
+          "examples": ["en", "en-US", "fr", "ja"]
+        },
+        "generated_at": {
+          "type": "string",
+          "description": "ISO 8601 datetime when the synthesis was generated (relevant for living documents).",
+          "format": "date-time"
+        },
+        "based_on_version": {
+          "type": "integer",
+          "description": "The bundle version the synthesis was based on (relevant for staleness detection).",
+          "minimum": 1
+        },
+        "staleness": {
+          "type": "object",
+          "description": "Staleness information when context has updated since synthesis was generated.",
+          "properties": {
+            "is_stale": {
+              "type": "boolean",
+              "description": "Whether the synthesis is considered stale relative to the current context."
+            },
+            "stale_since": {
+              "type": "string",
+              "description": "ISO 8601 datetime when the synthesis became stale.",
+              "format": "date-time"
+            },
+            "changed_items": {
+              "type": "array",
+              "description": "IDs of context items that changed since the synthesis was generated.",
+              "items": {
+                "type": "string"
+              }
+            },
+            "recommendation": {
+              "type": "string",
+              "description": "Suggested action for the user regarding staleness.",
+              "examples": ["Consider regenerating synthesis"]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "context": {
+      "type": "object",
+      "description": "Metadata about the context materials included in the bundle.",
+      "required": ["scope", "item_count", "items"],
+      "properties": {
+        "scope": {
+          "type": "string",
+          "description": "How the context scope was determined.",
+          "enum": ["full", "focused", "private", "custom"],
+          "examples": ["full"]
+        },
+        "item_count": {
+          "type": "integer",
+          "description": "Total number of context items in the bundle.",
+          "minimum": 0,
+          "examples": [5]
+        },
+        "total_size_bytes": {
+          "type": "integer",
+          "description": "Total size of all context items in bytes.",
+          "minimum": 0,
+          "examples": [2457600]
+        },
+        "items": {
+          "type": "array",
+          "description": "Array of context item descriptors. May be empty for bundles with auto-detected context.",
+          "items": {
+            "$ref": "#/$defs/contextItem"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "surface": {
+      "type": "object",
+      "description": "Profile-specific surface metadata. Structure is defined by the profile specified in the 'profile' field. See companion profile schemas for field definitions.",
+      "additionalProperties": true
+    },
+    "conversation": {
+      "type": "object",
+      "description": "Metadata about the conversation record that produced the synthesis.",
+      "properties": {
+        "model": {
+          "type": "string",
+          "description": "AI model used during the conversation.",
+          "examples": ["claude-sonnet-4-20250514"]
+        },
+        "turn_count": {
+          "type": "integer",
+          "description": "Number of conversation turns.",
+          "minimum": 0
+        },
+        "file": {
+          "type": ["string", "null"],
+          "description": "Relative path to conversation.json within the bundle. Null if excluded.",
+          "examples": ["conversation.json"]
+        },
+        "sharing": {
+          "type": "string",
+          "description": "Privacy sharing mode for the conversation record.",
+          "enum": ["full", "summary", "redacted", "excluded"],
+          "default": "excluded",
+          "examples": ["full"]
+        },
+        "summary": {
+          "type": "string",
+          "description": "AI-generated reasoning summary when sharing mode is 'summary'."
+        },
+        "turn_count_original": {
+          "type": "integer",
+          "description": "Original turn count before redaction/summarization.",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "permissions": {
+      "type": "object",
+      "description": "Advisory permission settings for the Tez. These are not technically enforceable for downloaded bundles.",
+      "properties": {
+        "interrogate": {
+          "type": "boolean",
+          "description": "Whether recipients can interrogate this Tez.",
+          "default": true
+        },
+        "fork": {
+          "type": "boolean",
+          "description": "Whether recipients can create derivative tezits.",
+          "default": true
+        },
+        "reshare": {
+          "type": "boolean",
+          "description": "Whether recipients can share this Tez with others.",
+          "default": false
+        },
+        "commercial_use": {
+          "type": "boolean",
+          "description": "Whether this Tez can be used for commercial purposes.",
+          "default": false
+        },
+        "license": {
+          "type": "string",
+          "description": "SPDX license identifier.",
+          "examples": ["CC-BY-4.0", "MIT", "Apache-2.0"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "lineage": {
+      "type": "object",
+      "description": "Fork and derivation lineage for this Tez.",
+      "properties": {
+        "forked_from": {
+          "type": ["string", "null"],
+          "description": "ID or URI of the parent Tez this was forked from. Null if this is an original Tez.",
+          "examples": ["acme-analysis-2026-01", null]
+        },
+        "fork_count": {
+          "type": "integer",
+          "description": "Number of known forks of this Tez.",
+          "minimum": 0,
+          "default": 0
+        },
+        "related": {
+          "type": "array",
+          "description": "IDs or URIs of related tezits.",
+          "items": {
+            "type": "string"
+          },
+          "examples": [["acme-analysis-2026-02", "acme-counter-tez-2026-01"]]
+        }
+      },
+      "additionalProperties": false
+    },
+    "sharing": {
+      "type": "object",
+      "description": "Configuration for how this Tez is shared and how interrogation is hosted.",
+      "properties": {
+        "hosting": {
+          "type": "string",
+          "description": "Interrogation hosting model.",
+          "enum": ["sender", "portable", "platform", "dual"],
+          "examples": ["sender"]
+        },
+        "hosting_url": {
+          "type": "string",
+          "description": "URL for sender-hosted interrogation endpoint.",
+          "format": "uri"
+        },
+        "hosting_limits": {
+          "type": "object",
+          "description": "Limits for sender-hosted interrogation.",
+          "properties": {
+            "interrogations_per_recipient": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "max_tokens_per_query": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "max_total_tokens_per_recipient": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "rate_limit_per_minute": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "expires_at": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "additionalProperties": false
+        },
+        "inherit_settings": {
+          "type": "boolean",
+          "description": "Whether recipients should inherit the sender's AI model configuration and RAG settings.",
+          "default": false
+        },
+        "allow_download": {
+          "type": "boolean",
+          "description": "Whether recipients can download the bundle for local interrogation."
+        },
+        "bundle_url": {
+          "type": "string",
+          "description": "URL to download the full bundle.",
+          "format": "uri"
+        },
+        "sender_hosted": {
+          "type": "object",
+          "description": "Configuration for the sender-hosted option in dual mode.",
+          "properties": {
+            "url": {
+              "type": "string",
+              "format": "uri"
+            },
+            "limits": {
+              "type": "object",
+              "properties": {
+                "interrogations": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "additionalProperties": true
+            }
+          },
+          "additionalProperties": false
+        },
+        "portable": {
+          "type": "object",
+          "description": "Configuration for the portable/download option in dual mode.",
+          "properties": {
+            "allow_download": {
+              "type": "boolean"
+            },
+            "bundle_url": {
+              "type": "string",
+              "format": "uri"
+            }
+          },
+          "additionalProperties": false
+        },
+        "version_policy": {
+          "type": "string",
+          "description": "How recipients receive version updates.",
+          "enum": ["latest", "pinned"]
+        },
+        "pinned_version": {
+          "type": "integer",
+          "description": "Specific version recipients see when version_policy is 'pinned'.",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "interrogation": {
+      "type": "object",
+      "description": "TIP (Tez Interrogation Protocol) configuration for this Tez.",
+      "properties": {
+        "tip_version": {
+          "type": "string",
+          "description": "Required TIP version.",
+          "examples": ["1.0"]
+        },
+        "required_features": {
+          "type": "array",
+          "description": "TIP features required for interrogation.",
+          "items": {
+            "type": "string"
+          },
+          "examples": [["citation_verification", "confidence_signals"]]
+        },
+        "recommended_model_family": {
+          "type": "string",
+          "description": "Recommended AI model family for interrogation.",
+          "examples": ["claude"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "privacy": {
+      "type": "object",
+      "description": "Privacy and data residency settings.",
+      "properties": {
+        "query_logging": {
+          "type": "string",
+          "description": "Query logging policy for interrogation sessions.",
+          "enum": ["none", "opt_in", "required"],
+          "default": "none"
+        },
+        "query_sharing_with_sender": {
+          "type": "boolean",
+          "description": "Whether queries are shared with the Tez creator.",
+          "default": false
+        },
+        "analytics_level": {
+          "type": "string",
+          "description": "Level of analytics collected.",
+          "enum": ["none", "aggregate_only", "detailed"],
+          "default": "aggregate_only"
+        },
+        "logging_scope": {
+          "type": "string",
+          "description": "What is logged when query_logging is enabled.",
+          "enum": ["queries_only", "queries_and_responses", "full_session"]
+        },
+        "retention_days": {
+          "type": "integer",
+          "description": "How many days logged data is retained.",
+          "minimum": 1
+        },
+        "deletion_available": {
+          "type": "boolean",
+          "description": "Whether recipients can request deletion of their logged data."
+        },
+        "data_residency": {
+          "type": "object",
+          "description": "Geographic restrictions for data processing and storage.",
+          "properties": {
+            "regions": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "model_regions": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "storage_regions": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "parameters": {
+      "type": "object",
+      "description": "Reference to negotiable parameters. Experimental -- see Appendix B of the protocol spec.",
+      "properties": {
+        "negotiable": {
+          "type": "boolean",
+          "description": "Whether the parameters are open for negotiation."
+        },
+        "count": {
+          "type": "integer",
+          "description": "Number of parameters defined.",
+          "minimum": 0
+        },
+        "file": {
+          "type": "string",
+          "description": "Relative path to the params.json file.",
+          "examples": ["params.json"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Extension data keyed by extension ID. Standard extensions use 'tezit-' prefix; custom extensions should use reverse-domain naming.",
+      "additionalProperties": {
+        "type": "object",
+        "description": "Extension-specific configuration and data."
+      },
+      "examples": [
+        {
+          "tezit-analytics": { "enabled": true },
+          "com.example.custom-feature": { "version": "1.0" }
+        }
+      ]
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "contextItem": {
+      "type": "object",
+      "description": "A single context item descriptor within the bundle.",
+      "required": ["id", "type", "title", "file"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for this context item within the bundle. Used in citations as [[item-id]].",
+          "pattern": "^[a-z0-9](?:[a-z0-9._-]*[a-z0-9])?$",
+          "examples": ["doc-001", "email-001", "revenue-model"]
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of context item.",
+          "enum": [
+            "document",
+            "email",
+            "spreadsheet",
+            "presentation",
+            "image",
+            "audio",
+            "video",
+            "code",
+            "data",
+            "webpage",
+            "message",
+            "note",
+            "custom"
+          ],
+          "examples": ["document"]
+        },
+        "title": {
+          "type": "string",
+          "description": "Human-readable title of the context item.",
+          "minLength": 1,
+          "examples": ["Q4 Financial Report"]
+        },
+        "source": {
+          "type": "string",
+          "description": "Origin or source description of the context item. Use 'linked' for live-linked sources.",
+          "examples": ["uploaded", "linked", "https://docs.google.com/spreadsheets/d/abc123"]
+        },
+        "file": {
+          "type": ["string", "null"],
+          "description": "Relative path to the file within the context/ directory. Null if the item is stored externally.",
+          "examples": ["context/doc-001.pdf"]
+        },
+        "external_uri": {
+          "type": "string",
+          "description": "URI for externally stored context items (when file is null). Must use HTTPS.",
+          "format": "uri",
+          "examples": ["https://storage.example.com/video-001.mp4"]
+        },
+        "mime_type": {
+          "type": "string",
+          "description": "MIME type of the context item.",
+          "examples": ["application/pdf", "text/markdown", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]
+        },
+        "size_bytes": {
+          "type": "integer",
+          "description": "Size of the context item in bytes.",
+          "minimum": 0,
+          "examples": [245760]
+        },
+        "hash": {
+          "type": "string",
+          "description": "Cryptographic hash for integrity verification. Format: 'algorithm:hex'.",
+          "pattern": "^[a-z0-9]+(:[a-f0-9]+)$",
+          "examples": ["sha256:3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b"]
+        },
+        "access": {
+          "type": "string",
+          "description": "Access level for this context item when shared.",
+          "enum": ["full", "interrogation_only", "summary_only"],
+          "default": "full"
+        },
+        "linked_source": {
+          "type": "object",
+          "description": "Configuration for live-linked context sources (living documents).",
+          "properties": {
+            "type": {
+              "type": "string",
+              "description": "Type of linked source.",
+              "enum": [
+                "google_sheets",
+                "google_docs",
+                "onedrive",
+                "sharepoint",
+                "dropbox",
+                "api",
+                "database",
+                "s3"
+              ]
+            },
+            "resource_id": {
+              "type": "string",
+              "description": "Platform-specific resource identifier."
+            },
+            "range": {
+              "type": "string",
+              "description": "Optional range or query for partial sync.",
+              "examples": ["Revenue!A1:F100"]
+            },
+            "sync_frequency": {
+              "type": "string",
+              "description": "How often the source is synchronized.",
+              "enum": ["manual", "hourly", "daily", "weekly", "realtime"]
+            },
+            "last_synced": {
+              "type": "string",
+              "description": "ISO 8601 datetime of the last successful sync.",
+              "format": "date-time"
+            },
+            "sync_hash": {
+              "type": "string",
+              "description": "Hash of the content at last sync for change detection.",
+              "pattern": "^[a-z0-9]+(:[a-f0-9]+)$"
+            }
+          },
+          "additionalProperties": false
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Arbitrary metadata for this context item.",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "examples": [
+    {
+      "tezit_version": "1.2",
+      "id": "acme-analysis-2026-01",
+      "version": 1,
+      "created_at": "2026-01-25T14:30:00Z",
+      "creator": {
+        "name": "Jane Smith",
+        "email": "jane@company.com",
+        "org": "Acme Corp"
+      },
+      "profile": "knowledge",
+      "synthesis": {
+        "title": "Acme Partnership Analysis",
+        "type": "recommendation",
+        "file": "tez.md",
+        "abstract": "Analysis of the proposed Acme partnership with recommendations for deal structure.",
+        "language": "en"
+      },
+      "context": {
+        "scope": "full",
+        "item_count": 3,
+        "total_size_bytes": 524288,
+        "items": [
+          {
+            "id": "client-specs",
+            "type": "document",
+            "title": "Client Technical Specifications",
+            "file": "context/client-specs.pdf",
+            "mime_type": "application/pdf",
+            "size_bytes": 245760,
+            "hash": "sha256:3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b"
+          },
+          {
+            "id": "sow-draft",
+            "type": "document",
+            "title": "Statement of Work Draft",
+            "file": "context/sow-draft.pdf",
+            "mime_type": "application/pdf",
+            "size_bytes": 163840
+          },
+          {
+            "id": "meeting-notes",
+            "type": "note",
+            "title": "Discovery Meeting Notes",
+            "file": "context/meeting-notes.md",
+            "mime_type": "text/markdown",
+            "size_bytes": 114688
+          }
+        ]
+      },
+      "conversation": {
+        "model": "claude-sonnet-4-20250514",
+        "turn_count": 12,
+        "file": "conversation.json",
+        "sharing": "full"
+      },
+      "permissions": {
+        "interrogate": true,
+        "fork": true,
+        "reshare": false,
+        "commercial_use": false,
+        "license": "CC-BY-4.0"
+      },
+      "lineage": {
+        "forked_from": null,
+        "fork_count": 0,
+        "related": []
+      }
+    }
+  ]
+}

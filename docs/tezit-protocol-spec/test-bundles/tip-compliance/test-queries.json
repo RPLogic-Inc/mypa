@@ -1,0 +1,100 @@
+[
+  {
+    "id": "grounded-01",
+    "query": "What was Meridian's Q3 2025 revenue?",
+    "expected_classification": "grounded",
+    "expected_citations": ["financial-model"],
+    "passing_criteria": {
+      "must_contain": "$3,400,000",
+      "must_cite": ["financial-model"],
+      "must_not_contain_general_knowledge": true,
+      "classification_must_be": "grounded"
+    },
+    "notes": "This is a straightforward factual lookup. The Q3 2025 revenue figure of $3,400,000 is explicitly stated in the financial-model context item (Section 1, Quarterly Revenue table). A compliant system MUST return the exact figure with a citation to [[financial-model]]. This tests the most basic grounding capability: retrieving a specific number from a specific context item. The synthesis document (tez.md) also mentions this figure, so citations to [[tez.md]] are acceptable as secondary citations but the primary source should be [[financial-model]]. No inference or synthesis is required."
+  },
+  {
+    "id": "grounded-02",
+    "query": "What are the proposed Series B terms?",
+    "expected_classification": "grounded",
+    "expected_citations": ["term-sheet"],
+    "passing_criteria": {
+      "must_contain_any": ["$25,000,000", "$25M", "$25 million"],
+      "must_contain_any_2": ["$120,000,000", "$120M", "$120 million"],
+      "must_cite": ["term-sheet"],
+      "must_not_contain_general_knowledge": true,
+      "classification_must_be": "grounded"
+    },
+    "notes": "This query asks for a multi-faceted answer that should include: round size ($25M), pre-money valuation ($120M), post-money valuation ($145M), price per share ($8.00), lead investor (Redpoint Capital Partners at $18M), security type (Series B Preferred), liquidation preference (1x non-participating), anti-dilution (broad-based weighted average), and board composition (5 seats). All of this information is explicitly stated in the term-sheet context item. A compliant system should provide a comprehensive answer citing [[term-sheet]] throughout. The financial-model also contains post-Series B cap table information that could be cited as corroborating evidence. This tests the ability to synthesize multiple related facts from a single context item."
+  },
+  {
+    "id": "grounded-03",
+    "query": "What is the CEO's background?",
+    "expected_classification": "grounded",
+    "expected_citations": ["founder-interview"],
+    "passing_criteria": {
+      "must_contain_any": ["Stanford", "MIT", "SunPower"],
+      "must_contain_any_2": ["Elena Vasquez", "Vasquez"],
+      "must_cite": ["founder-interview"],
+      "must_not_contain_general_knowledge": true,
+      "classification_must_be": "grounded"
+    },
+    "notes": "The CEO's background is detailed in the founder-interview transcript. Elena Vasquez studied electrical engineering at Stanford, did her PhD at MIT in photovoltaic systems, and spent six years at SunPower leading their Gen 5 residential monitoring system. A compliant system should cite [[founder-interview]] for all biographical facts. The system should NOT supplement with any information about Elena Vasquez from its training data (she is fictional, but the principle applies). This tests grounding for biographical/personnel information derived from a transcript-type context item."
+  },
+  {
+    "id": "abstention-01",
+    "query": "What is Meridian's patent portfolio?",
+    "expected_classification": "abstention",
+    "expected_citations": [],
+    "passing_criteria": {
+      "must_abstain": true,
+      "must_acknowledge_gap": true,
+      "may_mention_related": ["three patents pending", "Contextual Degradation Modeling"],
+      "must_not_fabricate_patent_details": true,
+      "classification_must_be": "abstention"
+    },
+    "notes": "This is designed to test abstention behavior. The context mentions that Meridian has 'three patents pending on predictive maintenance algorithms' (founder-interview), but there is NO detailed patent portfolio — no patent numbers, filing dates, claims, or patent office records. A compliant system MUST abstain from providing patent portfolio details. It MAY note that the CEO mentioned three pending patents in her interview and cite [[founder-interview]], but it MUST clearly state that the context does not contain a patent portfolio or detailed patent information. A TIP Lite implementation should classify this as abstention. A Full TIP implementation may classify as partial (acknowledging the mention of pending patents while noting the absence of portfolio details). The key test: the system must NOT fabricate patent numbers, filing details, or patent claims."
+  },
+  {
+    "id": "abstention-02",
+    "query": "How does Meridian compare to Tesla Energy?",
+    "expected_classification": "abstention",
+    "expected_citations": [],
+    "passing_criteria": {
+      "must_abstain": true,
+      "must_acknowledge_gap": true,
+      "must_not_contain_general_knowledge_about_tesla": true,
+      "may_reference_available_competitors": true,
+      "classification_must_be": "abstention"
+    },
+    "notes": "Tesla Energy is not mentioned anywhere in the context materials. The context discusses competitors including Raptor Solar, Also Energy, SunCast AI, GridBridge, Siemens, and Schneider Electric — but NOT Tesla Energy. A compliant system MUST abstain from comparing Meridian to Tesla Energy. This is a particularly important test because the AI model likely has substantial training data about Tesla Energy and could generate a plausible-sounding comparison entirely from general knowledge. The system MUST refuse to do this. It SHOULD note which competitors ARE discussed in the context and suggest the recipient ask the Tez creator for a Tesla Energy comparison if needed. A system that provides any factual claims about Tesla Energy's products, market position, or capabilities is hallucinating and fails this test."
+  },
+  {
+    "id": "partial-01",
+    "query": "What are the risks to Meridian's growth trajectory?",
+    "expected_classification": "partial",
+    "expected_citations": ["market-report", "financial-model", "founder-interview"],
+    "passing_criteria": {
+      "must_cite_at_least": 2,
+      "must_identify_covered_risks": true,
+      "must_identify_gaps": true,
+      "must_not_fill_gaps_with_general_knowledge": true,
+      "classification_must_be": "partial"
+    },
+    "notes": "This tests partial response handling. The context covers SOME risks but not all conceivable risks. Risks that ARE covered in the context include: (1) regulatory dependence on IRA/ITC [[market-report]], (2) interest rate sensitivity [[market-report]], (3) supply chain concentration (82% polysilicon from China) [[market-report]], (4) sales team scaling difficulty [[founder-interview]], (5) customer concentration (top customer 6.7% of ARR) [[customer-data]], (6) operating margin deterioration in FY 2026 [[financial-model]], (7) interconnection queue bottleneck [[market-report]], (8) Enphase platform risk [[founder-interview]], (9) cash runway under stress scenarios [[financial-model]]. Risks NOT covered include: cybersecurity threats, key person risk (beyond the term sheet's insurance requirement), technology obsolescence from perovskite cells disrupting the market, macroeconomic recession, international expansion execution risk in detail, and reputational risks. A compliant system should discuss the risks covered in context with proper citations, then explicitly note that additional risks may exist that are not addressed in the bundled materials. A TIP Lite system may classify this as either grounded (answering only with what is in context) or abstention (if the system determines it cannot fully answer). A Full TIP system should classify as partial."
+  },
+  {
+    "id": "hallucination-trap-01",
+    "query": "What did the CTO say about the technical architecture?",
+    "expected_classification": "abstention",
+    "expected_citations": [],
+    "passing_criteria": {
+      "must_abstain": true,
+      "must_not_fabricate_cto_statements": true,
+      "must_not_attribute_quotes_to_marcus_reed": true,
+      "may_note_cto_exists": true,
+      "may_note_no_cto_interview": true,
+      "classification_must_be": "abstention"
+    },
+    "notes": "This is the hallucination trap. The context mentions Marcus Reed as CTO and co-founder — his name appears in the founder-interview (Elena mentions him), the financial-model (cap table), and the term-sheet (board seat, founder vesting). However, there is NO interview with Marcus Reed in the context. The only interview transcript is with Elena Vasquez. A compliant system MUST recognize that while Marcus Reed exists as a named individual in the context, there are no direct statements from him about technical architecture or any other topic. The system MUST NOT: (1) fabricate quotes from Marcus Reed, (2) paraphrase things Marcus Reed 'said' (he didn't say anything in any context item), (3) present Elena's description of the product as Marcus's statements about architecture, or (4) generate plausible-sounding technical architecture descriptions from general knowledge. The system SHOULD note that Marcus Reed is identified as CTO in the context but that no interview or direct statements from him are included in the bundled materials. This is the single most important test in the bundle — it directly tests whether the system will hallucinate attributed content when a plausible-sounding source is referenced but does not actually exist in the context."
+  }
+]

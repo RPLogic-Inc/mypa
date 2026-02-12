@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tezit.com/spec/v1.2/coordination-surface.schema.json",
+  "title": "Tez Coordination Surface",
+  "description": "Schema for the surface object of a coordination profile tez. Represents a single coordination item (task, decision, question, or blocker) with status tracking, assignments, dependencies, and context trail. Enforces the v1.1-draft constraint that decisions and questions cannot have 'in_progress' status.",
+  "type": "object",
+  "required": ["item_type", "title", "status"],
+  "properties": {
+    "item_type": {
+      "type": "string",
+      "description": "The type of coordination item.",
+      "enum": ["task", "decision", "question", "blocker"],
+      "examples": ["task", "decision"]
+    },
+    "title": {
+      "type": "string",
+      "description": "Human-readable title of the coordination item.",
+      "minLength": 1,
+      "examples": ["Migrate user table to new schema", "Choose authentication provider"]
+    },
+    "status": {
+      "type": "string",
+      "description": "Current status of the coordination item.",
+      "enum": ["pending", "acknowledged", "in_progress", "blocked", "completed", "cancelled"],
+      "examples": ["pending", "in_progress", "completed"]
+    },
+    "assignee": {
+      "type": "object",
+      "description": "Person or entity assigned to this coordination item.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the assignee.",
+          "examples": ["user-jane-smith", "team-backend"]
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable name of the assignee.",
+          "examples": ["Jane Smith", "Backend Team"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "due_date": {
+      "type": "string",
+      "description": "Target completion date for the coordination item.",
+      "format": "date",
+      "examples": ["2026-03-15"]
+    },
+    "priority": {
+      "type": "string",
+      "description": "Priority level of the coordination item.",
+      "enum": ["critical", "high", "medium", "low"],
+      "examples": ["high", "medium"]
+    },
+    "dependencies": {
+      "type": "array",
+      "description": "Other coordination items this item depends on or relates to.",
+      "items": {
+        "type": "object",
+        "required": ["item_id", "type"],
+        "properties": {
+          "item_id": {
+            "type": "string",
+            "description": "Identifier of the dependency item.",
+            "examples": ["task-db-migration-001"]
+          },
+          "type": {
+            "type": "string",
+            "description": "Nature of the dependency relationship.",
+            "enum": ["blocks", "requires", "related"],
+            "examples": ["blocks", "requires"]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "context_trail": {
+      "type": "array",
+      "description": "Trail of context references that informed or led to this coordination item.",
+      "items": {
+        "type": "object",
+        "required": ["source_type", "source_id"],
+        "properties": {
+          "source_type": {
+            "type": "string",
+            "description": "Type of the source that provided context.",
+            "examples": ["meeting", "slack_message", "document", "email"]
+          },
+          "source_id": {
+            "type": "string",
+            "description": "Identifier of the source.",
+            "examples": ["meeting-2026-02-01", "slack-msg-abc123"]
+          },
+          "excerpt": {
+            "type": "string",
+            "description": "Relevant excerpt from the source.",
+            "examples": ["We agreed to prioritize the database migration before the auth refactor."]
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "item_type": {
+            "enum": ["decision", "question"]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "status": {
+            "not": {
+              "const": "in_progress"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "additionalProperties": false
+}

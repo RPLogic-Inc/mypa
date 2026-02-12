@@ -1,0 +1,30 @@
+{
+  "name": "mypa-chat",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Tez-native communication platform powered by OpenClaw",
+  "workspaces": [
+    "backend",
+    "relay",
+    "pa-workspace",
+    "canvas"
+  ],
+  "scripts": {
+    "test:backend": "cd backend && npm test",
+    "test:relay": "cd relay && npm test",
+    "test:pa-workspace": "cd pa-workspace && npm test",
+    "test:all": "npm run test:backend && npm run test:relay && npm run test:pa-workspace",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:relay": "cd relay && npm run dev",
+    "dev:pa-workspace": "cd pa-workspace && npm run dev",
+    "dev:canvas": "cd canvas && npm run dev",
+    "build:backend": "cd backend && npx tsc",
+    "build:canvas": "cd canvas && npm run build",
+    "build:canvas:a2ui": "cd canvas && VITE_A2UI=true npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ragurob/MyPA.chat.git"
+  },
+  "license": "AGPL-3.0"
+}

@@ -1,0 +1,19 @@
+{
+  "name": "@mypa/openclaw-channel-tezit",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "OpenClaw channel plugin for native Tez messaging via the Tezit Relay",
+  "openclaw": {
+    "extensions": ["./src/channel.ts"]
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "vitest": "^3.0.0",
+    "typescript": "^5.7.0"
+  }
+}

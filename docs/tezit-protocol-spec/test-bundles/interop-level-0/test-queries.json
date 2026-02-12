@@ -1,0 +1,115 @@
+[
+  {
+    "id": "level0-knowledge-01",
+    "target_file": "knowledge-profile.md",
+    "target_profile": "knowledge",
+    "query": "What was the total Q4 2025 revenue?",
+    "expected_classification": "grounded",
+    "expected_citations": ["revenue-report"],
+    "passing_criteria": {
+      "must_contain": "$47.2M",
+      "must_cite": ["revenue-report"],
+      "classification_must_be": "grounded"
+    },
+    "notes": "Basic factual lookup from the inline synthesis. The figure $47.2M is explicitly stated with a citation to [[revenue-report:p3]]."
+  },
+  {
+    "id": "level0-knowledge-02",
+    "target_file": "knowledge-profile.md",
+    "target_profile": "knowledge",
+    "query": "What drove the gross margin improvement?",
+    "expected_classification": "grounded",
+    "expected_citations": ["cost-analysis", "revenue-report"],
+    "passing_criteria": {
+      "must_contain_any": ["reserved instances", "embedding model", "inference costs"],
+      "must_cite_at_least": 1,
+      "classification_must_be": "grounded"
+    },
+    "notes": "The synthesis lists three drivers of margin expansion, each with citations to either [[cost-analysis]] or [[revenue-report]]. A compliant system should reference at least one."
+  },
+  {
+    "id": "level0-knowledge-03",
+    "target_file": "knowledge-profile.md",
+    "target_profile": "knowledge",
+    "query": "What is the company's employee headcount?",
+    "expected_classification": "abstention",
+    "expected_citations": [],
+    "passing_criteria": {
+      "must_abstain": true,
+      "must_not_fabricate_headcount": true,
+      "classification_must_be": "abstention"
+    },
+    "notes": "Employee headcount is not mentioned anywhere in the inline tez. A compliant system must abstain."
+  },
+  {
+    "id": "level0-coordination-01",
+    "target_file": "coordination-profile.md",
+    "target_profile": "coordination",
+    "query": "What is the current status of the rate limiting task?",
+    "expected_classification": "grounded",
+    "expected_citations": [],
+    "passing_criteria": {
+      "must_contain_any": ["in_progress", "in progress"],
+      "must_mention_completed_items": true,
+      "must_mention_remaining_items": true,
+      "classification_must_be": "grounded"
+    },
+    "notes": "The surface schema shows status: in_progress. The checklist shows 2 of 5 items completed (design review, in-memory implementation). Remaining: Redis integration, failover, tests."
+  },
+  {
+    "id": "level0-coordination-02",
+    "target_file": "coordination-profile.md",
+    "target_profile": "coordination",
+    "query": "Who is responsible for this task and when is it due?",
+    "expected_classification": "grounded",
+    "expected_citations": [],
+    "passing_criteria": {
+      "must_contain": "Alex Chen",
+      "must_contain_any_2": ["February 7", "2026-02-07"],
+      "classification_must_be": "grounded"
+    },
+    "notes": "Assignee (Alex Chen) and due date (2026-02-07T17:00:00Z) are in the surface schema."
+  },
+  {
+    "id": "level0-codereview-01",
+    "target_file": "code-review-profile.md",
+    "target_profile": "code_review",
+    "query": "What is the most critical finding in this review?",
+    "expected_classification": "grounded",
+    "expected_citations": ["src-token-service"],
+    "passing_criteria": {
+      "must_contain_any": ["plaintext cookie", "security flags", "httponly", "XSS"],
+      "must_reference_finding": "finding-001",
+      "classification_must_be": "grounded"
+    },
+    "notes": "Finding-001 is the critical finding: refresh token stored without security flags. The system should identify this as the most critical issue."
+  },
+  {
+    "id": "level0-codereview-02",
+    "target_file": "code-review-profile.md",
+    "target_profile": "code_review",
+    "query": "Were there any positive observations in the review?",
+    "expected_classification": "grounded",
+    "expected_citations": ["src-token-service"],
+    "passing_criteria": {
+      "must_contain_any": ["praise", "positive", "clean separation", "well-structured"],
+      "must_reference_finding": "finding-005",
+      "classification_must_be": "grounded"
+    },
+    "notes": "Finding-005 is a praise-type observation about clean separation of concerns. This tests the v0.2.0 observation_type feature."
+  },
+  {
+    "id": "level0-codereview-03",
+    "target_file": "code-review-profile.md",
+    "target_profile": "code_review",
+    "query": "What is the reviewer's confidence level on the rate limiting finding?",
+    "expected_classification": "grounded",
+    "expected_citations": [],
+    "passing_criteria": {
+      "must_contain": "medium",
+      "must_explain_reasoning": true,
+      "classification_must_be": "grounded"
+    },
+    "notes": "Finding-003 (rate limiting) has confidence: medium with reasoning that the global rate limiter may cover it. This tests the v0.2.0 confidence metadata feature."
+  }
+]

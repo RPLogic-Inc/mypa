@@ -1,0 +1,190 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tezit.com/spec/v1.2/conversation.schema.json",
+  "title": "Tezit Conversation Record Schema",
+  "description": "JSON Schema for the conversation.json file within a Tez bundle. Records the AI conversation that produced the synthesis, including turns, tool calls, citations, privacy controls, and token usage. The conversation record is optional in a Tez bundle and its inclusion is governed by the conversation.sharing field in the manifest.",
+  "type": "object",
+  "properties": {
+    "model": {
+      "type": "string",
+      "description": "Identifier of the AI model used during the conversation.",
+      "examples": ["claude-sonnet-4-20250514", "gpt-4o-2024-11-20"]
+    },
+    "model_version": {
+      "type": "string",
+      "description": "Specific version string of the AI model, if different from the model identifier.",
+      "examples": ["2025-05-14"]
+    },
+    "system_prompt": {
+      "type": "string",
+      "description": "The system prompt used during the conversation. May be omitted for privacy."
+    },
+    "turns": {
+      "type": "array",
+      "description": "Ordered array of conversation turns between user, assistant, system, and tool roles.",
+      "items": {
+        "$ref": "#/$defs/turn"
+      }
+    },
+    "total_tokens": {
+      "type": "integer",
+      "description": "Total tokens consumed across all turns (input + output).",
+      "minimum": 0,
+      "examples": [45000]
+    },
+    "duration_seconds": {
+      "type": "number",
+      "description": "Total wall-clock duration of the conversation in seconds.",
+      "minimum": 0,
+      "examples": [1380.5]
+    },
+    "privacy_mode": {
+      "type": "string",
+      "description": "The privacy/sharing mode applied to this conversation record. Mirrors the manifest conversation.sharing field.",
+      "enum": ["full", "summary", "redacted", "excluded"],
+      "examples": ["full"]
+    },
+    "redactions": {
+      "type": "array",
+      "description": "Bulk redaction entries identifying groups of turns that were redacted and why.",
+      "items": {
+        "type": "object",
+        "required": ["turn_indices", "reason"],
+        "properties": {
+          "turn_indices": {
+            "type": "array",
+            "description": "Zero-based indices of redacted turns.",
+            "items": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "reason": {
+            "type": "string",
+            "description": "Explanation of why these turns were redacted.",
+            "examples": ["Contains internal pricing discussion", "Contains PII"]
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "turn": {
+      "type": "object",
+      "description": "A single turn in the conversation.",
+      "required": ["role", "content"],
+      "properties": {
+        "role": {
+          "type": "string",
+          "description": "The role of the participant for this turn.",
+          "enum": ["user", "assistant", "system", "tool"]
+        },
+        "content": {
+          "type": "string",
+          "description": "The text content of this turn. For redacted turns, this contains the redaction placeholder."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "ISO 8601 datetime when this turn occurred.",
+          "format": "date-time",
+          "examples": ["2026-01-25T10:00:00Z"]
+        },
+        "name": {
+          "type": "string",
+          "description": "Name identifier, primarily used for tool call turns to identify the tool."
+        },
+        "citations": {
+          "type": "array",
+          "description": "Context item IDs (with optional location specifiers) cited in this turn.",
+          "items": {
+            "type": "string"
+          },
+          "examples": [["client-specs:p12", "sow-draft:p3"]]
+        },
+        "tool_calls": {
+          "type": "array",
+          "description": "Tool calls made by the assistant in this turn.",
+          "items": {
+            "type": "object",
+            "required": ["id", "name", "arguments"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Unique identifier for this tool call."
+              },
+              "name": {
+                "type": "string",
+                "description": "Name of the tool being called."
+              },
+              "arguments": {
+                "type": "object",
+                "description": "Arguments passed to the tool.",
+                "additionalProperties": true
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "tool_results": {
+          "type": "array",
+          "description": "Results returned from tool calls.",
+          "items": {
+            "type": "object",
+            "required": ["id", "content"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The tool call ID this result corresponds to."
+              },
+              "content": {
+                "type": "string",
+                "description": "The content returned by the tool."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "redacted": {
+          "type": "boolean",
+          "description": "Whether this turn has been redacted.",
+          "default": false
+        },
+        "redaction_reason": {
+          "type": "string",
+          "description": "Explanation of why this turn was redacted.",
+          "examples": ["Contains proprietary cost calculations"]
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Arbitrary metadata for this turn.",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "examples": [
+    {
+      "model": "claude-sonnet-4-20250514",
+      "model_version": "2025-05-14",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Analyze the client specs and draft a statement of work",
+          "timestamp": "2026-01-25T10:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Based on the client specifications [[client-specs:p12]], I recommend a phased approach...",
+          "timestamp": "2026-01-25T10:00:15Z",
+          "citations": ["client-specs:p12", "client-specs:p23"]
+        }
+      ],
+      "total_tokens": 45000,
+      "duration_seconds": 1380.5,
+      "privacy_mode": "full"
+    }
+  ]
+}

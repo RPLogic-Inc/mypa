@@ -1,0 +1,34 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1770580341180,
+      "tag": "0000_remarkable_cardiac",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1739048400000,
+      "tag": "0001_deprecate_openclaw_tokens",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1770648000000,
+      "tag": "0002_remove_legacy_openclaw_token_column",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1770652800000,
+      "tag": "0003_playable_tezit_upgrade",
+      "breakpoints": true
+    }
+  ]
+}

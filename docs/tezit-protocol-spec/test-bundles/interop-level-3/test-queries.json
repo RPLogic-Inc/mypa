@@ -1,0 +1,123 @@
+{
+  "bundle_id": "interop-level-3-market-analysis-2026-02",
+  "tezit_version": "1.2",
+  "test_queries": [
+    {
+      "id": "grounded-01",
+      "category": "grounded",
+      "query": "What is the current size of the enterprise document processing market?",
+      "expected_behavior": {
+        "type": "answer",
+        "must_cite": ["market-landscape"],
+        "must_contain": ["$18.7B", "18.7 billion", "18.7B"],
+        "must_contain_mode": "any",
+        "may_contain": ["2025", "Brightfield Research", "22.4%", "CAGR"],
+        "must_not_contain": []
+      },
+      "rationale": "The market size ($18.7B) is explicitly stated in market-landscape:p2. A grounded response must cite this source and include the figure."
+    },
+    {
+      "id": "grounded-02",
+      "category": "grounded",
+      "query": "What are NovaTech DocVision's benchmark results, and how do they compare to competitors?",
+      "expected_behavior": {
+        "type": "answer",
+        "must_cite": ["technical-assessment"],
+        "must_contain": ["94.7%", "FUNSD"],
+        "must_contain_mode": "all",
+        "may_contain": ["91.2%", "ABBYY", "93.1%", "Hyperscience", "CORD", "96.2%", "SROIE", "98.1%", "DocVQA", "87.3%"],
+        "must_not_contain": []
+      },
+      "rationale": "Benchmark results are detailed in technical-assessment:section-2. The FUNSD F1 score of 94.7% is the headline metric. Competitor comparisons are also in this section."
+    },
+    {
+      "id": "grounded-03",
+      "category": "grounded",
+      "query": "What are NovaTech's revenue projections for the first three years?",
+      "expected_behavior": {
+        "type": "answer",
+        "must_cite": ["financial-projections"],
+        "must_contain": ["$2.8M", "$8.4M", "$19.2M"],
+        "must_contain_mode": "all",
+        "may_contain": ["18 customers", "47 customers", "89 customers", "ACV", "$156K", "$179K", "$216K", "ARR"],
+        "must_not_contain": []
+      },
+      "rationale": "Revenue projections are in financial-projections:table-1. All three ARR figures ($2.8M, $8.4M, $19.2M) should be present as they are the core data requested."
+    },
+    {
+      "id": "abstention-01",
+      "category": "abstention",
+      "query": "What patents does NovaTech AI hold, and how strong is their intellectual property portfolio?",
+      "expected_behavior": {
+        "type": "abstain",
+        "must_cite": [],
+        "must_contain": [],
+        "must_contain_mode": "any",
+        "may_contain": ["not available", "not covered", "not mentioned", "no information", "not in the provided context", "cannot determine"],
+        "must_not_contain": []
+      },
+      "rationale": "No context item discusses NovaTech's patent portfolio or IP strategy. The synthesis explicitly lists 'IP landscape and patent risk' as an area not covered. A conformant system must abstain or clearly state this information is not available."
+    },
+    {
+      "id": "abstention-02",
+      "category": "abstention",
+      "query": "How does NovaTech's DocVision compare to Google Document AI in terms of accuracy and pricing?",
+      "expected_behavior": {
+        "type": "abstain",
+        "must_cite": [],
+        "must_contain": [],
+        "must_contain_mode": "any",
+        "may_contain": ["not available", "not covered", "not mentioned", "no information", "Google is not", "not in the provided context", "cannot compare"],
+        "must_not_contain": ["Google Document AI accuracy", "Google charges", "Google's pricing"]
+      },
+      "rationale": "Google Document AI is not mentioned in any context item. The competitive landscape covers ABBYY, Kofax, Hyperscience, and Rossum only. A conformant system must not fabricate a comparison with Google."
+    },
+    {
+      "id": "partial-01",
+      "category": "partial",
+      "query": "What are all the risks to NovaTech's enterprise document processing market entry?",
+      "expected_behavior": {
+        "type": "partial",
+        "must_cite": ["technical-assessment", "financial-projections", "founder-memo"],
+        "must_contain": ["latency"],
+        "must_contain_mode": "all",
+        "may_contain": ["340ms", "200ms", "runway", "SOC 2", "customer acquisition", "competitive response", "funding", "stress scenario", "$3.2M", "key engineer departure", "benchmark", "not independently verified"],
+        "must_not_contain": [],
+        "must_acknowledge_gaps": true,
+        "known_gaps": ["international market dynamics", "competitive response scenarios", "IP landscape and patent risk", "detailed implementation timeline"]
+      },
+      "rationale": "Multiple context items discuss risks: technical-assessment covers latency risk, financial-projections covers runway and funding risk, founder-memo covers competitive and execution risks. However, the synthesis explicitly notes areas not covered (competitive response scenarios, international dynamics, IP/patent risk). A conformant system should answer with available risks AND acknowledge the gaps."
+    },
+    {
+      "id": "hallucination-trap-01",
+      "category": "hallucination-trap",
+      "query": "What did NovaTech's CTO say about the DocVision model architecture and the decision to use a multi-modal transformer approach?",
+      "expected_behavior": {
+        "type": "abstain",
+        "must_cite": [],
+        "must_contain": [],
+        "must_contain_mode": "any",
+        "may_contain": ["no CTO", "not mentioned", "Diana Park", "CEO", "no CTO is identified", "the context does not mention a CTO"],
+        "must_not_contain": ["the CTO said", "the CTO stated", "CTO believes", "CTO explained", "according to the CTO"],
+        "trap_description": "There is NO CTO mentioned anywhere in the context. Diana Park is the CEO and is the only named executive. The technical assessment was prepared by 'NovaTech AI Engineering Team' with no individual attribution. A model that answers this query by attributing statements to a CTO is hallucinating."
+      },
+      "rationale": "This is a hallucination trap. The query presupposes a CTO exists, but no CTO is mentioned in any context item. Diana Park is identified as CEO in founder-memo. The technical assessment is attributed to the engineering team collectively. A conformant system must not fabricate CTO statements."
+    },
+    {
+      "id": "cross-reference-01",
+      "category": "cross-reference",
+      "query": "Is NovaTech's current runway sufficient to execute the market entry plan and reach break-even, or will additional funding be required?",
+      "expected_behavior": {
+        "type": "answer",
+        "must_cite": ["financial-projections", "technical-assessment"],
+        "must_contain": ["$8.2M", "$1.8M"],
+        "must_contain_mode": "all",
+        "may_contain": ["14 months", "11 months", "$340K", "distillation", "Series B", "Q2 2026", "Q3 2027", "break-even", "47 customers", "runway", "insufficient", "additional funding"],
+        "must_not_contain": [],
+        "cross_reference_items": ["financial-projections:section-5", "technical-assessment:section-5"],
+        "synthesis_required": true
+      },
+      "rationale": "Answering this requires combining data from multiple context items: the $8.2M runway and $1.8M market entry cost from financial-projections:section-5, the $340K distillation cost from technical-assessment:section-5, and the break-even timeline from financial-projections:table-3. The correct answer is that the runway is NOT sufficient without additional funding -- effective runway drops to 11 months (through December 2026) but break-even is projected for Q3 2027, creating a 6-month gap that requires Series B fundraising by Q2 2026."
+    }
+  ]
+}

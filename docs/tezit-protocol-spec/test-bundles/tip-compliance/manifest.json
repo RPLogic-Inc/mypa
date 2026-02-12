@@ -1,0 +1,99 @@
+{
+  "$schema": "https://tezit.com/spec/v1.2/manifest.schema.json",
+  "tezit_version": "1.2",
+  "id": "tip-compliance-test-2026-02",
+  "version": 1,
+  "created_at": "2026-02-05T00:00:00Z",
+
+  "creator": {
+    "name": "Tezit Compliance Team",
+    "org": "Tezit",
+    "url": "https://tezit.com"
+  },
+
+  "profile": "knowledge",
+
+  "synthesis": {
+    "title": "TIP Compliance Reference Test Bundle",
+    "type": "analysis",
+    "file": "tez.md",
+    "abstract": "A reference test bundle for verifying TIP compliance. Contains a synthesis analyzing Meridian Solar's Series B fundraising opportunity, backed by five context items covering market data, financials, founder interview, customer metrics, and term sheet details.",
+    "language": "en"
+  },
+
+  "context": {
+    "scope": "full",
+    "item_count": 5,
+    "items": [
+      {
+        "id": "market-report",
+        "type": "document",
+        "title": "Global Solar Energy Market Report 2025",
+        "source": "Helios Research Group",
+        "file": "context/market-report.md",
+        "mime_type": "text/markdown",
+        "metadata": {
+          "publication_date": "2025-11-15",
+          "report_type": "industry-analysis"
+        }
+      },
+      {
+        "id": "financial-model",
+        "type": "data",
+        "title": "Meridian Solar Financial Model and Projections",
+        "source": "Meridian Solar CFO Office",
+        "file": "context/financial-model.md",
+        "mime_type": "text/markdown",
+        "metadata": {
+          "fiscal_year": "2025",
+          "model_version": "3.2"
+        }
+      },
+      {
+        "id": "founder-interview",
+        "type": "transcript",
+        "title": "Interview with Elena Vasquez, CEO & Co-Founder of Meridian Solar",
+        "source": "Series B Due Diligence — Conducted by Redpoint Capital Partners",
+        "file": "context/founder-interview.md",
+        "mime_type": "text/markdown",
+        "metadata": {
+          "interview_date": "2025-12-10",
+          "interviewer": "James Chen, Partner at Redpoint Capital",
+          "duration_minutes": 62
+        }
+      },
+      {
+        "id": "customer-data",
+        "type": "data",
+        "title": "Meridian Solar Customer Metrics Dashboard — Q4 2025",
+        "source": "Meridian Solar Revenue Operations",
+        "file": "context/customer-data.md",
+        "mime_type": "text/markdown",
+        "metadata": {
+          "reporting_period": "Q4 2025",
+          "data_as_of": "2025-12-31"
+        }
+      },
+      {
+        "id": "term-sheet",
+        "type": "document",
+        "title": "Series B Term Sheet Summary — Redpoint Capital Partners",
+        "source": "Redpoint Capital Partners",
+        "file": "context/term-sheet-summary.md",
+        "mime_type": "text/markdown",
+        "metadata": {
+          "deal_stage": "term-sheet",
+          "draft_date": "2026-01-08"
+        }
+      }
+    ]
+  },
+
+  "permissions": {
+    "interrogate": true,
+    "fork": true,
+    "reshare": true,
+    "commercial_use": false,
+    "license": "CC-BY-NC-4.0"
+  }
+}

@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tezit.com/spec/v1.2/inline-tez.schema.json",
+  "title": "Tezit Inline Tez Schema (Level 0)",
+  "description": "JSON Schema for validating the YAML frontmatter of an Inline Tez (Level 0). An Inline Tez is a single Markdown file with YAML frontmatter containing synthesis, context references, and metadata. This schema describes the structure of the parsed YAML frontmatter object. Citations in the Markdown body reference context items by their 'label' field rather than by item-id.",
+  "type": "object",
+  "required": [
+    "tezit",
+    "title",
+    "profile"
+  ],
+  "properties": {
+    "tezit": {
+      "type": "string",
+      "description": "Tezit Protocol version string.",
+      "examples": ["1.2"]
+    },
+    "title": {
+      "type": "string",
+      "description": "Human-readable title of the Inline Tez.",
+      "minLength": 1,
+      "examples": ["Q4 Budget Analysis"]
+    },
+    "profile": {
+      "type": "string",
+      "description": "Tez profile indicating the intended consumption pattern.",
+      "enum": ["knowledge", "messaging", "decision", "handoff", "learning", "negotiation"],
+      "examples": ["knowledge"]
+    },
+    "creator": {
+      "type": "object",
+      "description": "Information about the creator of this Inline Tez.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Creator's name.",
+          "examples": ["Jane Smith"]
+        },
+        "email": {
+          "type": "string",
+          "description": "Creator's email address.",
+          "format": "email",
+          "examples": ["jane@company.com"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "context": {
+      "type": "array",
+      "description": "List of context references. Each item must have a label and either a url or file path.",
+      "items": {
+        "type": "object",
+        "required": ["label"],
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "URL to an external context source.",
+            "format": "uri",
+            "examples": ["https://docs.google.com/spreadsheets/d/abc123"]
+          },
+          "file": {
+            "type": "string",
+            "description": "Relative path to a local file.",
+            "examples": ["./email-thread.pdf"]
+          },
+          "label": {
+            "type": "string",
+            "description": "Human-readable label for this context item. Used in double-bracket citations within the Markdown body, e.g. [[Q4 Budget Spreadsheet]].",
+            "minLength": 1,
+            "examples": ["Q4 Budget Spreadsheet", "CFO Email Thread"]
+          }
+        },
+        "anyOf": [
+          { "required": ["url"] },
+          { "required": ["file"] }
+        ],
+        "additionalProperties": false
+      }
+    },
+    "permissions": {
+      "type": "object",
+      "description": "Advisory permission settings.",
+      "properties": {
+        "interrogate": {
+          "type": "boolean",
+          "description": "Whether recipients can interrogate this Tez.",
+          "default": true
+        },
+        "fork": {
+          "type": "boolean",
+          "description": "Whether recipients can create derivative tezits.",
+          "default": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "tags": {
+      "type": "array",
+      "description": "Classification tags for the Inline Tez.",
+      "items": {
+        "type": "string"
+      },
+      "examples": [["budget", "q4", "infrastructure"]]
+    }
+  },
+  "additionalProperties": true,
+  "examples": [
+    {
+      "tezit": "1.2",
+      "title": "Q4 Budget Analysis",
+      "profile": "knowledge",
+      "creator": {
+        "name": "Jane Smith",
+        "email": "jane@company.com"
+      },
+      "context": [
+        {
+          "url": "https://docs.google.com/spreadsheets/d/abc123",
+          "label": "Q4 Budget Spreadsheet"
+        },
+        {
+          "file": "./email-thread.pdf",
+          "label": "CFO Email Thread"
+        }
+      ],
+      "permissions": {
+        "interrogate": true,
+        "fork": true
+      },
+      "tags": ["budget", "q4", "infrastructure"]
+    }
+  ]
+}

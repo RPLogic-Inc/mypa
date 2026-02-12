@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tezit.com/spec/v1.2/code-review-surface.schema.json",
+  "title": "Tez Code Review Surface",
+  "description": "Schema for the surface object of a code review profile tez, providing a high-level summary of the review including findings counts, observation breakdown, and overall verdict.",
+  "type": "object",
+  "required": ["review_id", "findings_count"],
+  "properties": {
+    "review_id": {
+      "type": "string",
+      "description": "Unique identifier for this code review.",
+      "minLength": 1,
+      "examples": ["review-pr-142-2026-02-01", "review-abc123"]
+    },
+    "repository": {
+      "type": "string",
+      "description": "Repository identifier or URL being reviewed.",
+      "examples": ["acme/backend-api", "https://github.com/acme/backend-api"]
+    },
+    "branch": {
+      "type": "string",
+      "description": "Branch name under review.",
+      "examples": ["feature/user-auth", "fix/sql-injection"]
+    },
+    "commit_sha": {
+      "type": "string",
+      "description": "Git commit SHA of the code being reviewed.",
+      "examples": ["a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"]
+    },
+    "pull_request": {
+      "type": "object",
+      "description": "Pull request associated with this review.",
+      "properties": {
+        "number": {
+          "type": "integer",
+          "description": "Pull request number.",
+          "minimum": 1,
+          "examples": [142]
+        },
+        "url": {
+          "type": "string",
+          "description": "URL of the pull request.",
+          "format": "uri",
+          "examples": ["https://github.com/acme/backend-api/pull/142"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "reviewer": {
+      "type": "object",
+      "description": "Information about the entity that performed the review.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the reviewer.",
+          "examples": ["reviewer-jane", "ai-claude-opus"]
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable name of the reviewer.",
+          "examples": ["Jane Smith", "Claude Code Review"]
+        },
+        "type": {
+          "type": "string",
+          "description": "Whether the reviewer is a human or AI.",
+          "enum": ["human", "ai"],
+          "examples": ["human", "ai"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "findings_count": {
+      "type": "object",
+      "description": "Summary counts of findings in the review.",
+      "required": ["total"],
+      "properties": {
+        "total": {
+          "type": "integer",
+          "description": "Total number of findings.",
+          "minimum": 0,
+          "examples": [12]
+        },
+        "by_severity": {
+          "type": "object",
+          "description": "Findings count broken down by severity level.",
+          "properties": {
+            "critical": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "high": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "medium": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "low": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "info": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false
+        },
+        "by_status": {
+          "type": "object",
+          "description": "Findings count broken down by status.",
+          "properties": {
+            "open": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "accepted": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "dismissed": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "fixed": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "observation_summary": {
+      "type": "object",
+      "description": "Breakdown of findings by observation type. Added in v0.2.0 to distinguish issues from praise, questions, and notes.",
+      "properties": {
+        "issues": {
+          "type": "integer",
+          "description": "Number of findings classified as issues.",
+          "minimum": 0
+        },
+        "praises": {
+          "type": "integer",
+          "description": "Number of findings classified as praise.",
+          "minimum": 0
+        },
+        "questions": {
+          "type": "integer",
+          "description": "Number of findings classified as questions.",
+          "minimum": 0
+        },
+        "notes": {
+          "type": "integer",
+          "description": "Number of findings classified as notes.",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "overall_verdict": {
+      "type": "string",
+      "description": "The reviewer's overall verdict on the code under review.",
+      "enum": ["approve", "request_changes", "comment"],
+      "examples": ["approve", "request_changes"]
+    }
+  },
+  "additionalProperties": false
+}

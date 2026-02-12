@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tezit.com/spec/v1.2/code-review-finding.schema.json",
+  "title": "Tez Code Review Finding",
+  "description": "Schema for individual code review findings within a code review profile tez",
+  "type": "object",
+  "required": ["id", "severity", "category", "title", "description", "status"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique finding identifier within the code review.",
+      "minLength": 1,
+      "examples": ["finding-001", "sec-xss-login-form"]
+    },
+    "severity": {
+      "type": "string",
+      "description": "Severity level of the finding.",
+      "enum": ["critical", "high", "medium", "low", "info"],
+      "examples": ["high", "medium"]
+    },
+    "category": {
+      "type": "string",
+      "description": "Category classifying the type of finding.",
+      "enum": [
+        "bug",
+        "security",
+        "performance",
+        "style",
+        "design",
+        "maintainability",
+        "documentation",
+        "testing",
+        "accessibility",
+        "other"
+      ],
+      "examples": ["security", "performance"]
+    },
+    "observation_type": {
+      "type": "string",
+      "description": "The type of observation this finding represents. Added in v0.2.0 to support praise, questions, and notes alongside issues.",
+      "enum": ["issue", "praise", "question", "note"],
+      "default": "issue",
+      "examples": ["issue", "praise"]
+    },
+    "title": {
+      "type": "string",
+      "description": "Short human-readable title summarizing the finding.",
+      "minLength": 1,
+      "examples": ["SQL injection vulnerability in user search", "Missing null check on response object"]
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed explanation of the finding, including context, impact, and rationale.",
+      "minLength": 1,
+      "examples": ["The user search endpoint constructs SQL queries using string concatenation with unsanitized user input, allowing arbitrary SQL injection."]
+    },
+    "status": {
+      "type": "string",
+      "description": "Current status of the finding in the review workflow.",
+      "enum": ["open", "accepted", "dismissed", "fixed"],
+      "examples": ["open", "fixed"]
+    },
+    "location": {
+      "type": "object",
+      "description": "Source code location where the finding applies.",
+      "required": ["file"],
+      "properties": {
+        "file": {
+          "type": "string",
+          "description": "Relative file path within the repository.",
+          "minLength": 1,
+          "examples": ["src/api/users.ts", "lib/auth/session.py"]
+        },
+        "line_start": {
+          "type": "integer",
+          "description": "Starting line number of the relevant code.",
+          "minimum": 1,
+          "examples": [42]
+        },
+        "line_end": {
+          "type": "integer",
+          "description": "Ending line number of the relevant code.",
+          "minimum": 1,
+          "examples": [58]
+        },
+        "function": {
+          "type": "string",
+          "description": "Name of the function or method containing the finding.",
+          "examples": ["searchUsers", "validate_token"]
+        },
+        "class": {
+          "type": "string",
+          "description": "Name of the class containing the finding.",
+          "examples": ["UserController", "AuthService"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "suggestion": {
+      "type": "object",
+      "description": "Suggested fix or improvement for the finding.",
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of the suggested change.",
+          "examples": ["Use parameterized queries instead of string concatenation."]
+        },
+        "code": {
+          "type": "string",
+          "description": "Code snippet demonstrating the suggested fix.",
+          "examples": ["const results = await db.query('SELECT * FROM users WHERE name = $1', [searchTerm]);"]
+        },
+        "rendering_hint": {
+          "type": "string",
+          "description": "Hint for how the suggestion should be rendered in a UI. Added in v0.2.0.",
+          "enum": ["inline_diff", "side_by_side", "unified", "code_block"],
+          "examples": ["inline_diff", "code_block"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "confidence": {
+      "type": "string",
+      "description": "Confidence level of the finding, particularly relevant for AI-generated reviews. Added in v0.2.0.",
+      "enum": ["high", "medium", "low"],
+      "examples": ["high", "medium"]
+    },
+    "confidence_reasoning": {
+      "type": "string",
+      "description": "Explanation of why the reviewer assigned the given confidence level. Added in v0.2.0.",
+      "examples": ["Pattern matches known SQL injection vulnerability with direct string concatenation of user input."]
+    },
+    "tags": {
+      "type": "array",
+      "description": "Optional tags for additional categorization or filtering.",
+      "items": {
+        "type": "string"
+      },
+      "examples": [["sql-injection", "owasp-top-10", "user-input"]]
+    }
+  },
+  "additionalProperties": false
+}

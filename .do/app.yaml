@@ -1,0 +1,75 @@
+# DigitalOcean App Platform deployment spec.
+# Deploy with: doctl apps create --spec .do/app.yaml
+# Or use the "Deploy to DO" button in the README.
+
+name: mypa
+region: nyc
+
+services:
+  - name: backend
+    github:
+      repo: RPLogic-Inc/mypa
+      branch: main
+      deploy_on_push: true
+    source_dir: backend
+    dockerfile_path: backend/Dockerfile
+    http_port: 3001
+    instance_count: 1
+    instance_size_slug: apps-s-1vcpu-2gb
+    health_check:
+      http_path: /health/live
+      initial_delay_seconds: 15
+      period_seconds: 10
+    envs:
+      - key: JWT_SECRET
+        type: SECRET
+        value: "CHANGE_ME"
+      - key: DATABASE_URL
+        value: "file:/app/data/mypa.db"
+      - key: RELAY_URL
+        value: "${relay.PRIVATE_URL}"
+      - key: RELAY_ENABLED
+        value: "true"
+      - key: NODE_ENV
+        value: "production"
+      - key: APP_NAME
+        value: "MyPA"
+
+  - name: relay
+    github:
+      repo: RPLogic-Inc/mypa
+      branch: main
+      deploy_on_push: true
+    source_dir: relay
+    dockerfile_path: relay/Dockerfile
+    http_port: 3002
+    instance_count: 1
+    instance_size_slug: apps-s-1vcpu-1gb
+    health_check:
+      http_path: /health
+      initial_delay_seconds: 10
+      period_seconds: 10
+    envs:
+      - key: JWT_SECRET
+        type: SECRET
+        value: "CHANGE_ME"
+      - key: DATABASE_URL
+        value: "file:/app/data/tezit-relay.db"
+      - key: NODE_ENV
+        value: "production"
+
+  - name: canvas
+    github:
+      repo: RPLogic-Inc/mypa
+      branch: main
+      deploy_on_push: true
+    source_dir: canvas
+    dockerfile_path: canvas/Dockerfile
+    http_port: 80
+    instance_count: 1
+    instance_size_slug: apps-s-1vcpu-0.5gb
+    envs:
+      - key: VITE_BASE_DOMAIN
+        value: "${APP_DOMAIN}"
+      - key: VITE_INSTANCE_MODE
+        value: "team"

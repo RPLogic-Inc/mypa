@@ -1,0 +1,15 @@
+{
+  "_comment": "Add this section to your /root/.openclaw/openclaw.json under 'channels'",
+  "channels": {
+    "tezit": {
+      "enabled": true,
+      "relayUrl": "http://localhost:3002",
+      "jwtToken": "SERVICE_JWT_TOKEN_HERE",
+      "teamId": "DEFAULT_TEAM_UUID_HERE",
+      "userId": "PA_OWNER_USER_UUID_HERE",
+      "displayName": "My PA",
+      "email": "pa@mypa.chat",
+      "pollIntervalMs": 10000
+    }
+  }
+}

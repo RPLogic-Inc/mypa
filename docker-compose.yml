@@ -1,0 +1,77 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "${BACKEND_PORT:-3001}:3001"
+    volumes:
+      - ./data/backend:/app/data
+    env_file: .env
+    environment:
+      - DATABASE_URL=file:/app/data/mypa.db
+      - RELAY_URL=http://relay:3002
+      - RELAY_ENABLED=true
+      - PORT=3001
+      - NODE_ENV=production
+    depends_on:
+      relay:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3001/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped
+
+  relay:
+    build: ./relay
+    ports:
+      - "${RELAY_PORT:-3002}:3002"
+    volumes:
+      - ./data/relay:/app/data
+    env_file: .env
+    environment:
+      - DATABASE_URL=file:/app/data/tezit-relay.db
+      - PORT=3002
+      - NODE_ENV=production
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3002/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  canvas:
+    build:
+      context: ./canvas
+      args:
+        VITE_BASE_DOMAIN: ${BASE_DOMAIN:-localhost}
+        VITE_INSTANCE_MODE: ${INSTANCE_MODE:-team}
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+      relay:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ═══════════════════════════════════════════════════════════════
+  # Optional: PA Workspace (Google Workspace integration)
+  # Uncomment to enable email/calendar/drive via Google Workspace.
+  # Requires a Google Workspace service account with domain-wide
+  # delegation. See docs/SELF_HOSTING.md for setup instructions.
+  # ═══════════════════════════════════════════════════════════════
+  # pa-workspace:
+  #   build: ./pa-workspace
+  #   ports:
+  #     - "3003:3003"
+  #   volumes:
+  #     - ./data/pa-workspace:/app/data
+  #   env_file: .env
+  #   environment:
+  #     - DATABASE_URL=file:/app/data/pa-workspace.db
+  #     - PORT=3003
+  #     - NODE_ENV=production
+  #   restart: unless-stopped

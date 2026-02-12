@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tezit.com/spec/v1.2/enterprise-tip-eval.schema.json",
+  "title": "Tez Enterprise TIP Evaluation Metrics",
+  "description": "Schema for enterprise evaluation metrics of Tez Interrogation Protocol (TIP) sessions. Captures relevance, faithfulness, citation accuracy, completeness, and abstention rate metrics for assessing interrogation quality. Supports both aggregate session-level metrics and per-query breakdowns.",
+  "type": "object",
+  "required": ["session_id", "evaluated_at", "metrics"],
+  "properties": {
+    "session_id": {
+      "type": "string",
+      "description": "Identifier of the interrogation session being evaluated.",
+      "minLength": 1,
+      "examples": ["tip-sess-a1b2c3d4e5f6"]
+    },
+    "evaluated_at": {
+      "type": "string",
+      "description": "ISO 8601 datetime when the evaluation was performed.",
+      "format": "date-time",
+      "examples": ["2026-02-05T14:30:00Z"]
+    },
+    "metrics": {
+      "$ref": "#/$defs/evaluationMetrics",
+      "description": "Aggregate evaluation metrics for the entire session."
+    },
+    "per_query_results": {
+      "type": "array",
+      "description": "Optional per-query evaluation results for detailed analysis.",
+      "items": {
+        "type": "object",
+        "required": ["query_id", "query_text", "metrics"],
+        "properties": {
+          "query_id": {
+            "type": "string",
+            "description": "Identifier of the individual query within the session.",
+            "examples": ["query-001", "query-002"]
+          },
+          "query_text": {
+            "type": "string",
+            "description": "The text of the query that was evaluated.",
+            "examples": ["What does the budget say about infrastructure costs?"]
+          },
+          "metrics": {
+            "$ref": "#/$defs/evaluationMetrics",
+            "description": "Evaluation metrics for this specific query."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "evaluator": {
+      "type": "object",
+      "description": "Information about how the evaluation was performed.",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Whether the evaluation was performed by automated tooling, a human, or a combination.",
+          "enum": ["automated", "human", "hybrid"],
+          "examples": ["automated", "hybrid"]
+        },
+        "model": {
+          "type": "string",
+          "description": "AI model used for automated evaluation, if applicable.",
+          "examples": ["claude-opus-4-6-20250605", "gpt-4o"]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "evaluationMetrics": {
+      "type": "object",
+      "description": "Set of evaluation metrics scored on a 0-1 scale.",
+      "required": ["relevance", "faithfulness", "citation_accuracy", "completeness", "abstention_rate"],
+      "properties": {
+        "relevance": {
+          "type": "number",
+          "description": "Did the response address the question? 0 = completely irrelevant, 1 = perfectly relevant.",
+          "minimum": 0,
+          "maximum": 1,
+          "examples": [0.92]
+        },
+        "faithfulness": {
+          "type": "number",
+          "description": "Does the answer avoid hallucination beyond source material? 0 = entirely hallucinated, 1 = perfectly faithful to sources.",
+          "minimum": 0,
+          "maximum": 1,
+          "examples": [0.95]
+        },
+        "citation_accuracy": {
+          "type": "number",
+          "description": "Do citations correctly reference the claimed content? 0 = all citations wrong, 1 = all citations accurate.",
+          "minimum": 0,
+          "maximum": 1,
+          "examples": [0.88]
+        },
+        "completeness": {
+          "type": "number",
+          "description": "Did the response cover all relevant context? 0 = nothing covered, 1 = all relevant context addressed.",
+          "minimum": 0,
+          "maximum": 1,
+          "examples": [0.85]
+        },
+        "abstention_rate": {
+          "type": "number",
+          "description": "Rate of appropriate abstention when context is insufficient. 0 = never abstains when should, 1 = always appropriately abstains.",
+          "minimum": 0,
+          "maximum": 1,
+          "examples": [0.78]
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

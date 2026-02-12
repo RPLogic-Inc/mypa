@@ -1,0 +1,3 @@
+# OpenClaw Gateway auth token (server-side injection)
+# Replace YOUR_OPENCLAW_TOKEN_HERE with actual token from ~/.openclaw/openclaw.json
+proxy_set_header Authorization "Bearer YOUR_OPENCLAW_TOKEN_HERE";

@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tezit.com/spec/v1.2/manifest-portable.schema.json",
+  "title": "Tezit Portable Manifest Schema (Portable Tez - Level 2)",
+  "description": "Minimal JSON Schema for a Tezit Protocol v1.2 manifest.json file at Level 2 (Portable Tez) conformance. Contains only the required fields needed for tool recognition and basic interoperability. Context items are auto-detected from the bundle; an explicit items array is optional but recommended.",
+  "type": "object",
+  "required": [
+    "tezit_version",
+    "id",
+    "title",
+    "created_at",
+    "synthesis"
+  ],
+  "properties": {
+    "tezit_version": {
+      "type": "string",
+      "description": "Tezit Protocol version this manifest conforms to.",
+      "const": "1.2",
+      "examples": ["1.2"]
+    },
+    "id": {
+      "type": "string",
+      "description": "Unique bundle identifier. Must contain only lowercase letters, numbers, and hyphens. Must be 3-100 characters. Must not start or end with a hyphen.",
+      "pattern": "^[a-z0-9](?:[a-z0-9-]{1,98}[a-z0-9])?$",
+      "minLength": 3,
+      "maxLength": 100,
+      "examples": ["acme-analysis-2026-01"]
+    },
+    "title": {
+      "type": "string",
+      "description": "Human-readable name of the Tez.",
+      "minLength": 1,
+      "examples": ["Acme Partnership Analysis"]
+    },
+    "created_at": {
+      "type": "string",
+      "description": "ISO 8601 datetime when the bundle was created.",
+      "format": "date-time",
+      "examples": ["2026-01-25T14:30:00Z"]
+    },
+    "synthesis": {
+      "type": "object",
+      "description": "Minimal synthesis metadata. At Level 2, only the file path is required.",
+      "required": ["file"],
+      "properties": {
+        "file": {
+          "type": "string",
+          "description": "Relative path to the synthesis document within the bundle.",
+          "minLength": 1,
+          "examples": ["tez.md"]
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true,
+  "examples": [
+    {
+      "tezit_version": "1.2",
+      "id": "acme-analysis-2026-01",
+      "title": "Acme Partnership Analysis",
+      "created_at": "2026-01-25T14:30:00Z",
+      "synthesis": {
+        "file": "tez.md"
+      }
+    }
+  ]
+}

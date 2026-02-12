@@ -1,0 +1,94 @@
+{
+  "$schema": "https://tezit.com/spec/v1.2/manifest.schema.json",
+  "tezit_version": "1.2",
+  "id": "interop-level-3-market-analysis-2026-02",
+  "version": 1,
+  "created_at": "2026-02-05T00:00:00Z",
+
+  "creator": {
+    "name": "Ragu Platform Interop Team",
+    "org": "Ragu Platform",
+    "url": "https://ragu.ai"
+  },
+
+  "profile": "knowledge",
+
+  "synthesis": {
+    "title": "NovaTech AI Market Entry Analysis",
+    "type": "analysis",
+    "file": "tez.md",
+    "abstract": "Analysis of NovaTech AI's proposed market entry into the enterprise document processing sector, including competitive landscape, technical feasibility, financial projections, and strategic recommendations.",
+    "language": "en"
+  },
+
+  "context": {
+    "scope": "full",
+    "item_count": 4,
+    "items": [
+      {
+        "id": "market-landscape",
+        "type": "document",
+        "title": "Enterprise Document Processing Market Landscape 2025-2028",
+        "source": "Brightfield Research Group",
+        "file": "context/market-landscape.md",
+        "mime_type": "text/markdown",
+        "metadata": {
+          "publication_date": "2025-10-22",
+          "report_type": "market-analysis"
+        }
+      },
+      {
+        "id": "technical-assessment",
+        "type": "document",
+        "title": "NovaTech AI Technical Capability Assessment",
+        "source": "NovaTech AI Engineering",
+        "file": "context/technical-assessment.md",
+        "mime_type": "text/markdown",
+        "metadata": {
+          "assessment_date": "2025-12-01",
+          "classification": "internal-confidential"
+        }
+      },
+      {
+        "id": "financial-projections",
+        "type": "data",
+        "title": "NovaTech AI 3-Year Financial Projections",
+        "source": "NovaTech AI Finance",
+        "file": "context/financial-projections.md",
+        "mime_type": "text/markdown",
+        "metadata": {
+          "model_version": "2.1",
+          "base_year": "2025"
+        }
+      },
+      {
+        "id": "founder-memo",
+        "type": "document",
+        "title": "Strategic Rationale Memo from CEO",
+        "source": "Diana Park, CEO, NovaTech AI",
+        "file": "context/founder-memo.md",
+        "mime_type": "text/markdown",
+        "metadata": {
+          "memo_date": "2025-12-15",
+          "audience": "board-of-directors"
+        }
+      }
+    ]
+  },
+
+  "permissions": {
+    "interrogate": true,
+    "fork": true,
+    "reshare": true,
+    "commercial_use": false,
+    "license": "CC-BY-NC-4.0"
+  },
+
+  "extensions": [
+    {
+      "id": "tezit-facts",
+      "version": "1.0",
+      "data_file": "extensions/facts.json"
+    }
+  ]
+}

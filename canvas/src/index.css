@@ -1,0 +1,130 @@
+@import "tailwindcss";
+
+/* Bump default font sizes ~1px for readability */
+@theme {
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: calc(1.125 / 0.8125);
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: calc(1.3125 / 0.9375);
+  --text-base: 1.0625rem;
+  --text-base--line-height: calc(1.5625 / 1.0625);
+}
+
+/* Design system color tokens */
+@layer base {
+  :root {
+    --color-ai: #6366f1;
+    --color-ai-rgb: 99, 102, 241;
+    --color-team: #3b82f6;
+    --color-team-rgb: 59, 130, 246;
+    --color-personal: #10b981;
+    --color-personal-rgb: 16, 185, 129;
+    --color-urgent: #f59e0b;
+    --color-urgent-rgb: 245, 158, 11;
+    --color-artifact: #8b5cf6;
+    --color-artifact-rgb: 139, 92, 246;
+  }
+}
+
+@layer components {
+  /* Form inputs */
+  .input-field {
+    @apply rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors;
+  }
+
+  /* Glass morphism card */
+  .card-glass {
+    @apply rounded-xl border border-zinc-200 dark:border-white/[0.08];
+    backdrop-filter: blur(16px);
+    background: rgba(255, 255, 255, 0.9);
+  }
+  .dark .card-glass { background: rgba(24, 24, 27, 0.8); }
+
+  /* Sidebar navigation */
+  .nav-item {
+    @apply flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-150 cursor-pointer relative
+           text-zinc-400 hover:text-zinc-700 hover:bg-zinc-200/60
+           dark:text-zinc-500 dark:hover:text-zinc-200 dark:hover:bg-white/[0.08];
+  }
+  .nav-active {
+    @apply text-indigo-600 bg-indigo-100/80 dark:text-indigo-400 dark:bg-indigo-500/15;
+    box-shadow: inset 3px 0 0 var(--color-ai);
+  }
+
+  /* Tool badges */
+  .badge-tool {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+  .badge-web { @apply bg-emerald-500/15 text-emerald-400; }
+  .badge-memory { @apply bg-violet-500/15 text-violet-400; }
+  .badge-code { @apply bg-amber-500/15 text-amber-400; }
+  .badge-skill { @apply bg-blue-500/15 text-blue-400; }
+
+  /* Artifact type badges */
+  .badge-research { @apply bg-emerald-500/15 text-emerald-400 text-xs px-2 py-0.5 rounded-full; }
+  .badge-draft { @apply bg-blue-500/15 text-blue-400 text-xs px-2 py-0.5 rounded-full; }
+  .badge-briefing { @apply bg-violet-500/15 text-violet-400 text-xs px-2 py-0.5 rounded-full; }
+  .badge-analysis { @apply bg-amber-500/15 text-amber-400 text-xs px-2 py-0.5 rounded-full; }
+  .badge-email { @apply bg-teal-500/15 text-teal-400 text-xs px-2 py-0.5 rounded-full; }
+
+  /* Status badges */
+  .status-draft { @apply bg-zinc-500/15 text-zinc-400 text-xs px-2 py-0.5 rounded-full; }
+  .status-published { @apply bg-emerald-500/15 text-emerald-400 text-xs px-2 py-0.5 rounded-full; }
+  .status-shared { @apply bg-blue-500/15 text-blue-400 text-xs px-2 py-0.5 rounded-full; }
+}
+
+/* Animations */
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideOutRight {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(100%); opacity: 0; }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 200ms ease-out;
+}
+.animate-fade-in {
+  animation: fadeIn 150ms ease-out;
+}
+.animate-fade-slide-up {
+  animation: fadeSlideUp 200ms ease-out;
+}
+
+/* Dark mode gradient background */
+.bg-gradient-dark {
+  background: linear-gradient(180deg, #09090b 0%, #18181b 100%);
+}
+
+/* View transition wrapper */
+.view-transition {
+  animation: fadeSlideUp 150ms ease-out;
+}
+
+/* Scrollbar styling for dark mode */
+.dark ::-webkit-scrollbar {
+  width: 6px;
+}
+.dark ::-webkit-scrollbar-track {
+  background: transparent;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}

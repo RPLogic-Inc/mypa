@@ -1,0 +1,41 @@
+{
+  "extension_id": "tezit-facts",
+  "extension_version": "1.0",
+  "facts": [
+    {
+      "id": "fact-001",
+      "claim": "Enterprise document processing market is $18.7B in 2025",
+      "sources": ["market-landscape:p2"],
+      "confidence": "high",
+      "category": "market-data"
+    },
+    {
+      "id": "fact-002",
+      "claim": "Market CAGR is 22.4% through 2028",
+      "sources": ["market-landscape:p3"],
+      "confidence": "high",
+      "category": "market-data"
+    },
+    {
+      "id": "fact-003",
+      "claim": "DocVision achieves 94.7% F1 on FUNSD benchmark",
+      "sources": ["technical-assessment:section-2"],
+      "confidence": "medium",
+      "category": "technical"
+    },
+    {
+      "id": "fact-004",
+      "claim": "Break-even at 47 enterprise customers (Q3 2027)",
+      "sources": ["financial-projections:table-3"],
+      "confidence": "medium",
+      "category": "financial"
+    },
+    {
+      "id": "fact-005",
+      "claim": "Current runway is $8.2M (14 months)",
+      "sources": ["financial-projections:section-5"],
+      "confidence": "high",
+      "category": "financial"
+    }
+  ]
+}
