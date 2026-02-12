@@ -14,7 +14,7 @@ ENV VITE_RELAY_URL=$VITE_RELAY_URL
 ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
 
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 COPY . .
 RUN npm run build
 
